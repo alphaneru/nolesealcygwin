@@ -1,10 +1,6 @@
 name: Build multimon-ng with MSVC
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -21,14 +17,14 @@ jobs:
     - name: Install CMake
       uses: lukka/get-cmake@latest
 
-    - name: Download FFTW3
+    - name: Install FFTW3 via vcpkg
       run: |
-        curl -L -o fftw.zip https://fftw.org/pub/fftw/fftw-3.3.10-dll64.zip
-        7z x fftw.zip -offtw
-
+        git clone https://github.com/microsoft/vcpkg.git
+        .\vcpkg\bootstrap-vcpkg.bat
+        .\vcpkg\vcpkg.exe install fftw3:x64-windows
 
     - name: Configure project
-      run: cmake -B build -S . -A x64 -DFFTW3_INCLUDE_DIR=fftw/include -DFFTW3_LIBRARY=fftw/libfftw3-3.dll
+      run: cmake -B build -S . -A x64 -DCMAKE_TOOLCHAIN_FILE=vcpkg\scripts\buildsystems\vcpkg.cmake
 
     - name: Build project
       run: cmake --build build --config Release
