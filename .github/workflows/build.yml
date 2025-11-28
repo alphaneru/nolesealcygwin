@@ -24,7 +24,8 @@ jobs:
     - name: Download FFTW3
       run: |
         curl -L -o fftw.zip https://fftw.org/pub/fftw/fftw-3.3.10-dll64.zip
-        Expand-Archive fftw.zip -DestinationPath fftw
+        7z x fftw.zip -offtw
+
 
     - name: Configure project
       run: cmake -B build -S . -A x64 -DFFTW3_INCLUDE_DIR=fftw/include -DFFTW3_LIBRARY=fftw/libfftw3-3.dll
