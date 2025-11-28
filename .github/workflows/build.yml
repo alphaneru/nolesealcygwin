@@ -1,0 +1,40 @@
+name: Build multimon-ng with MSVC
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Setup MSVC environment
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Install CMake
+      uses: lukka/get-cmake@latest
+
+    - name: Download FFTW3
+      run: |
+        curl -L -o fftw.zip https://fftw.org/pub/fftw/fftw-3.3.10-dll64.zip
+        mkdir fftw
+        tar -xf fftw.zip -C fftw
+
+    - name: Configure project
+      run: cmake -B build -S . -A x64 -DFFTW3_INCLUDE_DIR=fftw/include -DFFTW3_LIBRARY=fftw/libfftw3-3.dll
+
+    - name: Build project
+      run: cmake --build build --config Release
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: multimon-ng-exe
+        path: build\Release\multimon-ng.exe
